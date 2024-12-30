@@ -1,4 +1,5 @@
 import os
+import time
 
 import rawpy
 import numpy as np
@@ -29,11 +30,19 @@ if __name__ == '__main__':
     rgb = np.array(raw.postprocess(output_bps=16))
     average = np.zeros(rgb.shape, np.float32)
 
-    with multiprocessing.Pool(processes=2) as pool: 
+    start_time = time.time()
+
+    with multiprocessing.Pool(processes=4) as pool: 
         results = pool.map(worker_function, dirlist)
 
     for result in results:
         average += result
+
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+
+    print("Elapsed time:", elapsed_time, "seconds")
 
     print(np.max(average))
 
@@ -43,23 +52,3 @@ if __name__ == '__main__':
     average = np.array(2**15 * (average-minval)/(maxval-minval), np.uint16)
     print(average)
 
-# rgb = None
-
-
-#         if rgb is None:
-#             rgb = np.array(raw.postprocess(output_bps=16))
-#             average = np.zeros(rgb.shape, np.float32)
-#             average += rgb
-#         else:
-#             rgb = np.array(raw.postprocess(output_bps=16))
-#             average += rgb
-#     print(average)
-
-# print(np.max(average))
-
-# maxval = np.max(average)
-# minval = np.min(average)
-# print(maxval, minval)
-# average = np.array(2**15 * (average-minval)/(maxval-minval), np.uint16)
-# print(average)
-# imageio.imsave('default.tiff', average)
